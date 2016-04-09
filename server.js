@@ -4,6 +4,8 @@ var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
 var app = express();
 
+app.use(bodyParser.urlencoded());
+
 // This is how we connect to the mongodb database using mongoose -- "basic_mongoose" is the name of
 //   our db in mongodb -- this should match the name of the db you are going to use for your project.
 mongoose.connect('mongodb://localhost/basic_mongoose');
@@ -12,8 +14,17 @@ app.use(express.static(path.join(__dirname, './static')));
 app.set('views', path.join(__dirname, './views'));
 app.set('view engine', 'ejs');
 app.get('/', function (req, res){
-	res.render('index');
-)};
+    User.find({}, function(err, users) {
+    // This is the method that finds all of the users from the database
+    // Notice how the first parameter is the options for what to find and the second is the
+    //   callback function that has an error (if any) and all of the users
+    // Keep in mind that everything you want to do AFTER you get the users from the database must
+    //   happen inside of this callback for it to be synchronous 
+    // Make sure you handle the case when there is an error, as well as the case when there is no error
+	console.log(users)
+	res.render('index', {users});
+  })
+});
 app.post('/users', function (req, res){
 	console.log('POST DATA', req.body);
 	//add user here
